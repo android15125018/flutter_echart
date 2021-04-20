@@ -52,9 +52,9 @@ class _EchartsState extends State<Echarts> {
       print("Finished loading $url");
       var data = json.encode(widget.data).toString();
       this.webController.evalJs(data);
-      setState(() {
-        finished = true;
-      });
+//      setState(() {
+//        finished = true;
+//      });
     });
   }
 
@@ -62,21 +62,33 @@ class _EchartsState extends State<Echarts> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    finished = false;
+//    finished = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-        overflow: Overflow.clip,
-        children: <Widget>[
-          widget.child ??
-              const Center(child: const CircularProgressIndicator()),
-          AnimatedOpacity(
-              duration: Duration(milliseconds: 300),
-              opacity: finished ? 1.0 : 0.0,
-              child: FlutterNativeWeb(
-                  onWebCreated: onWebCreated))
-        ]);
+//    return Stack(
+//        overflow: Overflow.clip,
+//        children: <Widget>[
+//          widget.child ??
+//              const Center(child: const CircularProgressIndicator()),
+//          AnimatedOpacity(
+//              duration: Duration(milliseconds: 300),
+//              opacity: finished ? 1.0 : 0.0,
+//              child: FlutterNativeWeb(
+//                  onWebCreated: onWebCreated))
+//        ]);
+    return FutureBuilder(
+      future: Future.delayed(Duration(milliseconds: 300)),
+      builder: (context,data){
+        if(data.connectionState==ConnectionState.done){
+          return FlutterNativeWeb(onWebCreated: onWebCreated);
+        }else{
+          return Center(child: const CircularProgressIndicator());
+        }
+
+      },
+
+    );
   }
 }
