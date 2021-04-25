@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.ValueCallback;
@@ -75,7 +77,23 @@ public class FlutterWeb implements PlatformView, MethodCallHandler {
 
     @Override
     public void dispose() {
+        if( webView!=null) {
+            // 如果先调用destroy()方法，则会命中if (isDestroyed()) return;这一行代码，需要先onDetachedFromWindow()，再
+            // destory()
+            ViewParent parent = webView.getParent();
+            if (parent != null) {
+                ((ViewGroup) parent).removeView(webView);
+            }
 
+            webView.stopLoading();
+            // 退出时调用此方法，移除绑定的服务，否则某些特定系统会报错
+            webView.getSettings().setJavaScriptEnabled(false);
+            webView.clearHistory();
+            webView.clearView();
+            webView.removeAllViews();
+            webView.destroy();
+
+        }
     }
 
     private WebView getWebView(Registrar registrar) {
@@ -85,6 +103,7 @@ public class FlutterWeb implements PlatformView, MethodCallHandler {
         webView.setBackgroundColor(Color.rgb(255,255,255));
         return webView;
     }
+
 
 
 
